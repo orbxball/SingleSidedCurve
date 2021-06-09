@@ -22,9 +22,6 @@ interface IUni {
         returns (uint256[] memory amounts);
 }
 
-// Import interfaces for many popular DeFi projects, or add your own!
-//import "../interfaces/<protocol>/<Interface>.sol";
-
 contract Strategy is BaseStrategy {
     using SafeERC20 for IERC20;
     using Address for address;
@@ -147,16 +144,10 @@ contract Strategy is BaseStrategy {
             curvePool.coins(3) == address(want) ||
             (_hasUnderlying && curvePool.underlying_coins(3) == address(want))
         ) {
-            //will revert if there are not enough coins
             curveId = 3;
         } else {
             require(false, "incorrect want for curve pool");
         }
-
-        /*if(_hasUnderlying){
-            middleToken = IERC20Extended(curvePool.coins(uint256(curveId)));
-            middle_decimals = middleToken.decimals();
-        }*/
 
         maxSingleInvest = _maxSingleInvest;
         minTimePerInvest = 6 hours;
@@ -324,15 +315,6 @@ contract Strategy is BaseStrategy {
         }
     }
 
-    /*function virtualPriceToMiddle() public view returns (uint256) {
-        if(middle_decimals < 18){
-            return curvePool.get_virtual_price().div(10 ** (uint256(uint8(18) - middle_decimals)));
-        }else{
-            return curvePool.get_virtual_price();
-        }
-
-    }*/
-
     function curveTokensInYVault() public view returns (uint256) {
         uint256 balance = yvToken.balanceOf(address(this));
 
@@ -436,46 +418,6 @@ contract Strategy is BaseStrategy {
 
     function _checkSlip(uint256 _wantToInvest) public view returns (bool) {
         return true;
-        /*
-        //convertToMiddle
-        if(hasUnderlying){
-            if(want_decimals > middle_decimals){
-                _wantToInvest = _wantToInvest.div(10 ** uint256(want_decimals - middle_decimals));
-
-            }else if (want_decimals < middle_decimals){
-                _wantToInvest = _wantToInvest.mul(10 ** uint256(middle_decimals - want_decimals));
-            }
-        }
-
-        uint256 vp = virtualPriceToWant();
-        uint256 expectedOut = _wantToInvest.mul(1e18).div(vp);
-
-        uint256 maxSlip = expectedOut.mul(DENOMINATOR.sub(slippageProtectionIn)).div(DENOMINATOR);
-
-        uint256 roughOut;
-
-        if(poolSize == 2){
-            uint256[2] memory amounts;
-            amounts[uint256(curveId)] = _wantToInvest;
-            //note doesnt take into account underlying
-            roughOut = curvePool.calc_token_amount(amounts, true);
-
-        }else if (poolSize == 3){
-            uint256[3] memory amounts;
-            amounts[uint256(curveId)] = _wantToInvest;
-            //note doesnt take into account underlying
-            roughOut = curvePool.calc_token_amount(amounts, true);
-
-        }else{
-            uint256[4] memory amounts;
-            amounts[uint256(curveId)] = _wantToInvest;
-            //note doesnt take into account underlying
-            roughOut = curvePool.calc_token_amount(amounts, true);
-        }
-
-        if(roughOut >= maxSlip){
-            return true;
-        }*/
     }
 
     function adjustPosition(uint256 _debtOutstanding) internal override {
@@ -532,12 +474,6 @@ contract Strategy is BaseStrategy {
             } else {
                 require(false, "quee");
             }
-
-            /*if(curveId == 0){
-                amounts = [_wantToInvest, 0];
-            }else{
-                amounts = [0, _wantToInvest];
-            }*/
         }
     }
 
@@ -643,19 +579,6 @@ contract Strategy is BaseStrategy {
         yvToken.transfer(_newStrategy, yvToken.balanceOf(address(this)));
     }
 
-    // Override this to add all tokens/tokenized positions this contract manages
-    // on a *persistent* basis (e.g. not just for swapping back to want ephemerally)
-    // NOTE: Do *not* include `want`, already included in `sweep` below
-    //
-    // Example:
-    //
-    //    function protectedTokens() internal override view returns (address[] memory) {
-    //      address[] memory protected = new address[](3);
-    //      protected[0] = tokenA;
-    //      protected[1] = tokenB;
-    //      protected[2] = tokenC;
-    //      return protected;
-    //    }
     function protectedTokens()
         internal
         view
