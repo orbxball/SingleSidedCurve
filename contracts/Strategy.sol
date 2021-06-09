@@ -27,22 +27,20 @@ contract Strategy is BaseStrategy {
     using Address for address;
     using SafeMath for uint256;
 
-    ICurveFi public curvePool; // =  ICurveFi(address(0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F));
-    ICrvV3 public curveToken; // = ICrvV3(address(0xb19059ebb43466C323583928285a49f558E572Fd));
+    ICurveFi public curvePool;
+    ICrvV3 public curveToken;
+    VaultAPI public yvToken;
 
     address public constant weth =
         address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     address public constant sushiswap =
         address(0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F);
 
-    VaultAPI public yvToken; // = IVaultV1(address(0x46AFc2dfBd1ea0c0760CAD8262A5838e803A37e5));
-    //IERC20Extended public middleToken; // the token between bluechip and curve pool
-
     uint256 public lastInvest = 0;
-    uint256 public minTimePerInvest; // = 3600;
-    uint256 public maxSingleInvest; // // 2 hbtc per hour default
-    uint256 public slippageProtectionIn; // = 50; //out of 10000. 50 = 0.5%
-    uint256 public slippageProtectionOut; // = 50; //out of 10000. 50 = 0.5%
+    uint256 public minTimePerInvest; // 1 hours
+    uint256 public maxSingleInvest;
+    uint256 public slippageProtectionIn; // in bps
+    uint256 public slippageProtectionOut; // in bps
     uint256 public constant DENOMINATOR = 10000;
 
     uint8 private want_decimals;
@@ -150,7 +148,7 @@ contract Strategy is BaseStrategy {
         }
 
         maxSingleInvest = _maxSingleInvest;
-        minTimePerInvest = 6 hours;
+        minTimePerInvest = 1 hours;
         slippageProtectionIn = _slippageProtectionIn;
         slippageProtectionOut = _slippageProtectionIn; // use In to start with to save on stack
 
