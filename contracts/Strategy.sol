@@ -163,9 +163,9 @@ contract Strategy is BaseStrategy {
     }
 
     function _setupStatics() internal {
-        maxReportDelay = 86400;
-        profitFactor = 1500;
-        minReportDelay = 3600;
+        maxReportDelay = 1 days;
+        minReportDelay = 1 hours;
+        profitFactor = 1000;
         debtThreshold = 100 * 1e18;
         withdrawProtection = true;
         want_decimals = IERC20Extended(address(want)).decimals();
