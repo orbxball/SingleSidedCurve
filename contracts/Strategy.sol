@@ -54,6 +54,7 @@ contract Strategy is BaseStrategy {
     int128 public curveId;
     uint256 public poolSize;
     bool public hasUnderlying;
+    bool public isDepositer;
 
     bool public withdrawProtection;
 
@@ -66,7 +67,8 @@ contract Strategy is BaseStrategy {
         address _curveToken,
         address _yvToken,
         uint256 _poolSize,
-        bool _hasUnderlying
+        bool _hasUnderlying,
+        bool _isDepositer
     ) public BaseStrategy(_vault) {
         _initializeStrat(
             _maxSingleInvest,
@@ -76,7 +78,8 @@ contract Strategy is BaseStrategy {
             _curveToken,
             _yvToken,
             _poolSize,
-            _hasUnderlying
+            _hasUnderlying,
+            _isDepositer
         );
     }
 
@@ -92,7 +95,8 @@ contract Strategy is BaseStrategy {
         address _curveToken,
         address _yvToken,
         uint256 _poolSize,
-        bool _hasUnderlying
+        bool _hasUnderlying,
+        bool _isDepositer
     ) external {
         //note: initialise can only be called once. in _initialize in BaseStrategy we have: require(address(want) == address(0), "Strategy already initialized");
         _initialize(_vault, _strategist, _rewards, _keeper);
@@ -104,7 +108,8 @@ contract Strategy is BaseStrategy {
             _curveToken,
             _yvToken,
             _poolSize,
-            _hasUnderlying
+            _hasUnderlying,
+            _isDepositer
         );
     }
 
@@ -116,7 +121,8 @@ contract Strategy is BaseStrategy {
         address _curveToken,
         address _yvToken,
         uint256 _poolSize,
-        bool _hasUnderlying
+        bool _hasUnderlying,
+        bool _isDepositer
     ) internal {
         require(want_decimals == 0, "Already Initialized");
         require(_poolSize > 1 && _poolSize < 5, "incorrect pool size");
@@ -124,21 +130,25 @@ contract Strategy is BaseStrategy {
         curvePool = ICurveFi(_curvePool);
 
         if (
+            (_isDepositer && curvePool.coins(0) == address(want)) ||
             curvePool.coins(0) == address(want) ||
             (_hasUnderlying && curvePool.underlying_coins(0) == address(want))
         ) {
             curveId = 0;
         } else if (
+            (_isDepositer && curvePool.base_coins(0) == address(want)) ||
             curvePool.coins(1) == address(want) ||
             (_hasUnderlying && curvePool.underlying_coins(1) == address(want))
         ) {
             curveId = 1;
         } else if (
+            (_isDepositer && curvePool.base_coins(1) == address(want)) ||
             curvePool.coins(2) == address(want) ||
             (_hasUnderlying && curvePool.underlying_coins(2) == address(want))
         ) {
             curveId = 2;
         } else if (
+            (_isDepositer && curvePool.base_coins(2) == address(want)) ||
             curvePool.coins(3) == address(want) ||
             (_hasUnderlying && curvePool.underlying_coins(3) == address(want))
         ) {
@@ -160,6 +170,7 @@ contract Strategy is BaseStrategy {
 
         poolSize = _poolSize;
         hasUnderlying = _hasUnderlying;
+        isDepositer = _isDepositer;
 
         yvToken = VaultAPI(_yvToken);
         curveToken = ICrvV3(_curveToken);
@@ -193,7 +204,8 @@ contract Strategy is BaseStrategy {
         address _curveToken,
         address _yvToken,
         uint256 _poolSize,
-        bool _hasUnderlying
+        bool _hasUnderlying,
+        bool _isDepositer
     ) external returns (address newStrategy) {
         bytes20 addressBytes = bytes20(address(this));
 
@@ -224,7 +236,8 @@ contract Strategy is BaseStrategy {
             _curveToken,
             _yvToken,
             _poolSize,
-            _hasUnderlying
+            _hasUnderlying,
+            _isDepositer
         );
 
         emit Cloned(newStrategy);
