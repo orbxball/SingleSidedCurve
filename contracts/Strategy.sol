@@ -284,26 +284,11 @@ contract Strategy is BaseStrategy {
 
     // returns value of total
     function curveTokenToWant(uint256 tokens) public view returns (uint256) {
-        if (tokens == 0) {
-            return 0;
-        }
-
-        //we want to choose lower value of virtual price and amount we really get out
-        //this means we will always underestimate current assets.
-        uint256 virtualOut = virtualPriceToWant().mul(tokens).div(1e18);
-
-        /*uint256 realOut;
-        if(hasUnderlying){
-            realOut = curvePool.calc_withdraw_one_coin(tokens, curveId, true);
-        }else{
-            realOut = curvePool.calc_withdraw_one_coin(tokens, curveId);
-        }*/
-
-        //return Math.min(virtualOut, realOut);
-        return virtualOut;
+        if (tokens == 0) return 0;
+        return virtualPriceToWant().mul(tokens).div(1e18);
     }
 
-    //we lose some precision here. but it shouldnt matter as we are underestimating
+    // we lose some precision here. but it shouldnt matter as we are underestimating
     function virtualPriceToWant() public view returns (uint256) {
         if (want_decimals < 18) {
             return
