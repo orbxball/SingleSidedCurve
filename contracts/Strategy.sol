@@ -61,7 +61,6 @@ contract Strategy is BaseStrategy {
     constructor(
         address _vault,
         uint256 _maxSingleInvest,
-        uint256 _minTimePerInvest,
         uint256 _slippageProtectionIn,
         address _curvePool,
         address _curveToken,
@@ -72,7 +71,6 @@ contract Strategy is BaseStrategy {
     ) public BaseStrategy(_vault) {
         _initializeStrat(
             _maxSingleInvest,
-            _minTimePerInvest,
             _slippageProtectionIn,
             _curvePool,
             _curveToken,
@@ -89,7 +87,6 @@ contract Strategy is BaseStrategy {
         address _rewards,
         address _keeper,
         uint256 _maxSingleInvest,
-        uint256 _minTimePerInvest,
         uint256 _slippageProtectionIn,
         address _curvePool,
         address _curveToken,
@@ -102,7 +99,6 @@ contract Strategy is BaseStrategy {
         _initialize(_vault, _strategist, _rewards, _keeper);
         _initializeStrat(
             _maxSingleInvest,
-            _minTimePerInvest,
             _slippageProtectionIn,
             _curvePool,
             _curveToken,
@@ -115,7 +111,6 @@ contract Strategy is BaseStrategy {
 
     function _initializeStrat(
         uint256 _maxSingleInvest,
-        uint256 _minTimePerInvest,
         uint256 _slippageProtectionIn,
         address _curvePool,
         address _curveToken,
@@ -164,7 +159,7 @@ contract Strategy is BaseStrategy {
         }*/
 
         maxSingleInvest = _maxSingleInvest;
-        minTimePerInvest = _minTimePerInvest;
+        minTimePerInvest = 6 hours;
         slippageProtectionIn = _slippageProtectionIn;
         slippageProtectionOut = _slippageProtectionIn; // use In to start with to save on stack
 
@@ -198,7 +193,6 @@ contract Strategy is BaseStrategy {
         address _rewards,
         address _keeper,
         uint256 _maxSingleInvest,
-        uint256 _minTimePerInvest,
         uint256 _slippageProtectionIn,
         address _curvePool,
         address _curveToken,
@@ -230,7 +224,6 @@ contract Strategy is BaseStrategy {
             _rewards,
             _keeper,
             _maxSingleInvest,
-            _minTimePerInvest,
             _slippageProtectionIn,
             _curvePool,
             _curveToken,
@@ -255,28 +248,28 @@ contract Strategy is BaseStrategy {
 
     function updateMinTimePerInvest(uint256 _minTimePerInvest)
         public
-        onlyGovernance
+        onlyAuthorized
     {
         minTimePerInvest = _minTimePerInvest;
     }
 
     function updateMaxSingleInvest(uint256 _maxSingleInvest)
         public
-        onlyGovernance
+        onlyAuthorized
     {
         maxSingleInvest = _maxSingleInvest;
     }
 
     function updateSlippageProtectionIn(uint256 _slippageProtectionIn)
         public
-        onlyGovernance
+        onlyAuthorized
     {
         slippageProtectionIn = _slippageProtectionIn;
     }
 
     function updateSlippageProtectionOut(uint256 _slippageProtectionOut)
         public
-        onlyGovernance
+        onlyAuthorized
     {
         slippageProtectionOut = _slippageProtectionOut;
     }
